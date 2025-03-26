@@ -1,1 +1,3 @@
 firebase-admin
+openai
+python-telegram-bot
