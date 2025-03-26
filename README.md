@@ -26,3 +26,8 @@ Clone this repository:
 ```bash
 git clone https://github.com/YOUR_GITHUB_USERNAME/study-helper-bot.git
 cd study-helper-bot
+
+Install dependencies:
+pip install -r requirements.txt
+
+
