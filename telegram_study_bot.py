@@ -1,50 +1,36 @@
 import os
-import openai
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackContext
 
-# Set up OpenAI API key
-openai.api_key = os.getenv("OPENAI_API_KEY")
-
-# Telegram Bot Token
+# Load the token securely
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+if not TOKEN:
+    print("\n🚨 ERROR: TELEGRAM_BOT_TOKEN is missing! Set it as an environment variable.")
+    exit(1)
 
+# Define command handlers
+def start(update: Update, context: CallbackContext):
+    update.message.reply_text("Hello! I am your study bot. How can I help you today?")
 
-async def start(update: Update, context: CallbackContext) -> None:
-    """Send a welcome message when the user starts the bot."""
-    await update.message.reply_text("Hello! I am your Study Helper Bot. Ask me any 10th or 2nd PUC question!")
+def help_command(update: Update, context: CallbackContext):
+    update.message.reply_text("You can ask me anything related to studies!")
 
+def handle_message(update: Update, context: CallbackContext):
+    text = update.message.text
+    update.message.reply_text(f"You said: {text}")
 
-async def handle_message(update: Update, context: CallbackContext) -> None:
-    """Handle user messages and get answers from OpenAI."""
-    user_message = update.message.text
-
-    try:
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role": "user", "content": user_message}]
-        )
-        answer = response["choices"][0]["message"]["content"]
-    except Exception as e:
-        answer = "Sorry, I couldn't process your request."
-
-    await update.message.reply_text(answer)
-
-
+# Main function to start the bot
 def main():
-    """Main function to run the bot."""
     app = Application.builder().token(TOKEN).build()
-
-    # Commands
+    
+    # Add handlers
     app.add_handler(CommandHandler("start", start))
-
-    # Messages
+    app.add_handler(CommandHandler("help", help_command))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
-
+    
     # Start the bot
-    print("Bot is running...")
+    print("✅ Bot is running...")
     app.run_polling()
-
 
 if __name__ == "__main__":
     main()
